@@ -1,3 +1,2 @@
-declare const fetchURLs: (url: string) => Promise<string[]>;
-declare const run: () => Promise<void>;
+export {};
 //# sourceMappingURL=index.d.ts.map
