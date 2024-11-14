@@ -1,12 +1,22 @@
 import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
-import readline from "readline";
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout,
-});
+// ------------------- INPUTS ------------------
+
+// REQUIRED - Copy your Podcast RSS Feeds into here
+const PODCAST_RSS_FEEDS: string[] = [
+  "https://feeds.simplecast.com/Urk3897_",
+  "https://feeds.megaphone.fm/GLT9487939818",
+];
+
+// REQUIRED - Enter the number of episodes you want downloading
+const AMOUNT: number = 5;
+
+// OPTIONAL - Enter the path to the folder you want the podcasts to go in.
+const DOWNLOAD_PATH: string = "../../podcasts";
+
+// ------------------- THE SCRIPT ----------------
 
 const fetchDownloadLinks = async (
   url: string,
@@ -24,7 +34,6 @@ const fetchDownloadLinks = async (
     for (let i = 0; i < amount; i++) {
       links.push(enclosureTags[i].match(/url="([^"]*)"/)[1]);
     }
-    console.log("title", title);
 
     return { title, links };
   } catch (e) {
@@ -42,51 +51,45 @@ const downloadFile = async (
     if (!response.ok) {
       throw new Error("Failed to fetch file");
     }
-    const filePath = path.resolve(downloadPath, `podcast-${index}.mp3`);
+    const filePath = path.resolve(downloadPath, `podcast-${index + 1}.mp3`);
+
     const fileStream = fs.createWriteStream(filePath);
     // Pipe the response data into the file stream
     response.body.pipe(fileStream);
 
     fileStream.on("finish", () => {
-      console.log(`Downloaded: ${filePath}`);
+      console.log(`Downloaded podcast at: ${filePath}`);
     });
   } catch (e) {
-    throw new Error(e);
+    console.error(e);
   }
 };
 
 const downloadFiles = async (
   downloadPath: string,
+  amount: number,
   urls: string[]
 ): Promise<void> => {
-  for (let i = 0; i < urls.length; i++)
-    await downloadFile(downloadPath, urls[i], i);
+  let count = amount - 1;
+  for (let i = 0; i < urls.length; i++, count--)
+    await downloadFile(downloadPath, urls[i], count);
 };
 
-const run = async () => {
-  rl.question("Enter the URL for the podcast's RSS feed: ", async (url) => {
-    rl.question(
-      "Enter the number of latest podcasts to download: ",
-      async (amount) => {
-        rl.question(
-          "Enter the download path (absolute or relative): ",
-          async (downloadPath) => {
-            const { title, links } = await fetchDownloadLinks(
-              url,
-              Number(amount)
-            );
-            const fullPath = path.resolve(downloadPath, title);
-            if (!fs.existsSync(fullPath)) {
-              fs.mkdirSync(fullPath, { recursive: true });
-            }
-            console.log("path", fullPath);
-            downloadFiles(fullPath, links);
-            rl.close();
-          }
-        );
-      }
-    );
-  });
+const run = async (
+  podcastURLs: string[],
+  amount: number,
+  downloadPath?: string
+) => {
+  for (let i = 0; i < podcastURLs.length; i++) {
+    const { title, links } = await fetchDownloadLinks(podcastURLs[i], amount);
+    const fullPath = path.resolve(downloadPath ?? "./", title);
+    if (!fs.existsSync(fullPath)) {
+      fs.mkdirSync(fullPath, { recursive: true });
+    }
+    downloadFiles(fullPath, amount, links);
+  }
 };
 
-run();
+if (PODCAST_RSS_FEEDS && AMOUNT) {
+  run(PODCAST_RSS_FEEDS, AMOUNT, DOWNLOAD_PATH);
+}

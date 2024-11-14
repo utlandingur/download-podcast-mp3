@@ -2,25 +2,21 @@
   "name": "download-podcast-mp3",
   "version": "1.0.0",
   "description": "script to automatically download mp3 files from podcast RSS feed",
-  "main": "cjs/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "npx tsc"
   },
   "type": "module",
-  "exports": {
-    "require": "./cjs/index.js",
-    "import": "./esm/index.js"
-  },
   "keywords": [],
-  "author": "",
+  "author": "Utlandingur",
   "license": "ISC",
   "dependencies": {
-    "@types/node-fetch": "^2.6.12",
     "node-fetch": "^3.3.2"
   },
   "devDependencies": {
     "ts-node": "^10.9.2",
+    "@types/node-fetch": "^2.6.12",
     "typescript": "^5.6.3"
   }
 }
