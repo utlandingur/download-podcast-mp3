@@ -1,6 +1,6 @@
 {
   "name": "podcast-rss-cli-tool",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "script to automatically download mp3 files from podcast RSS feed",
   "main": "dist/index.js",
   "scripts": {
@@ -13,7 +13,11 @@
     "mp3",
     "download"
   ],
-  "author": "Utlandingur",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/utlandingur/podcast-rss-cli-tool.git"
+  },
+  "author": "utlandingur",
   "license": "ISC",
   "dependencies": {
     "node-fetch": "^3.3.2",

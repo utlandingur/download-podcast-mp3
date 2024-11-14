@@ -22,16 +22,16 @@ No need for any repository setup – just run it as a global CLI tool.
 
 - **`rss`** (Required): A comma-separated list of podcast RSS feed URLs (e.g., `--rss https://example.com/feed1 https://example.com/feed2`).
 - **`amount`** (Optional): The number of episodes you want to download from each podcast feed. Defaults to 5.
-- **`path`** (Optional): The directory where the downloaded episodes will be saved. Defaults to `./downloads`.
+- **`path`** (Optional): The directory where the downloaded episodes will be saved. Defaults to current directory.
 
 ## How to Use
 
-### Option 1: Running Directly from Command Line (Global Tool)
+### Option 1 (RECOMMENDED): Running Directly from Command Line (Global Tool)
 
 1. Install the tool globally by running:
 
 ```bash
-npm install -g podcast-downloader
+npm install -g podcast-rss-cli-tool
 ```
 
 2. Use the command with your desired podcast RSS feed URLs:
@@ -78,7 +78,7 @@ podcast-downloader --rss "https://example.com/feed1" "https://example.com/feed2"
 This command will
 
 - Fetch the 3 most recent episodes from each podcast RSS FEED.
-  Save the episodes to the `./mypodcasts` folder
+- Save the episodes to the `./mypodcasts` folder
 
 ## Troubleshooting
 

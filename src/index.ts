@@ -99,7 +99,7 @@ const argv = yargs(hideBin(process.argv))
     alias: "p",
     type: "string",
     description: "Path to save downloaded podcasts",
-    default: "./downloads",
+    default: "./",
   }).argv;
 
 run(argv.rss as string[], argv.amount, argv.path);
