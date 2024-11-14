@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -10,17 +11,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 import fetch from "node-fetch";
 import fs from "fs";
 import path from "path";
-// ------------------- INPUTS ------------------
-// REQUIRED - Copy your Podcast RSS Feeds into here
-const PODCAST_RSS_FEEDS = [
-    "https://feeds.simplecast.com/Urk3897_",
-    "https://feeds.megaphone.fm/GLT9487939818",
-];
-// REQUIRED - Enter the number of episodes you want downloading
-const AMOUNT = 5;
-// OPTIONAL - Enter the path to the folder you want the podcasts to go in.
-const DOWNLOAD_PATH = "../../podcasts";
-// ------------------- THE SCRIPT ----------------
+import yargs from "yargs";
+import { hideBin } from "yargs/helpers";
+// ------------------- DEFAULT VALUES ------------------
+const PODCAST_RSS_FEEDS = process.env.PODCAST_RSS_FEEDS
+    ? process.env.PODCAST_RSS_FEEDS.split(",")
+    : [];
+const AMOUNT = process.env.AMOUNT ? parseInt(process.env.AMOUNT, 10) : 5;
+const DOWNLOAD_PATH = process.env.DOWNLOAD_PATH || ".";
+// ------------------- THE SCRIPT ------------------
 const fetchDownloadLinks = (url, amount) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const response = yield fetch(url);
@@ -37,7 +36,7 @@ const fetchDownloadLinks = (url, amount) => __awaiter(void 0, void 0, void 0, fu
         return { title, links };
     }
     catch (e) {
-        throw new Error(e);
+        console.error(e);
     }
 });
 const downloadFile = (downloadPath, url, index) => __awaiter(void 0, void 0, void 0, function* () {
@@ -48,10 +47,9 @@ const downloadFile = (downloadPath, url, index) => __awaiter(void 0, void 0, voi
         }
         const filePath = path.resolve(downloadPath, `podcast-${index + 1}.mp3`);
         const fileStream = fs.createWriteStream(filePath);
-        // Pipe the response data into the file stream
         response.body.pipe(fileStream);
         fileStream.on("finish", () => {
-            console.log(`Downloaded podcast at: ${filePath}`);
+            console.log(`Downloaded: ${filePath}`);
         });
     }
     catch (e) {
@@ -59,21 +57,38 @@ const downloadFile = (downloadPath, url, index) => __awaiter(void 0, void 0, voi
     }
 });
 const downloadFiles = (downloadPath, amount, urls) => __awaiter(void 0, void 0, void 0, function* () {
-    let count = amount - 1;
-    for (let i = 0; i < urls.length; i++, count--)
-        yield downloadFile(downloadPath, urls[i], count);
+    for (let i = 0; i < urls.length; i++) {
+        yield downloadFile(downloadPath, urls[i], i);
+    }
 });
 const run = (podcastURLs, amount, downloadPath) => __awaiter(void 0, void 0, void 0, function* () {
     for (let i = 0; i < podcastURLs.length; i++) {
         const { title, links } = yield fetchDownloadLinks(podcastURLs[i], amount);
-        const fullPath = path.resolve(downloadPath !== null && downloadPath !== void 0 ? downloadPath : "./", title);
+        const fullPath = path.resolve(downloadPath, title);
         if (!fs.existsSync(fullPath)) {
             fs.mkdirSync(fullPath, { recursive: true });
         }
-        downloadFiles(fullPath, amount, links);
+        yield downloadFiles(fullPath, amount, links);
     }
 });
-if (PODCAST_RSS_FEEDS && AMOUNT) {
-    run(PODCAST_RSS_FEEDS, AMOUNT, DOWNLOAD_PATH);
-}
+const argv = yargs(hideBin(process.argv))
+    .option("rss", {
+    alias: "r",
+    type: "array",
+    description: "Comma-separated list of podcast RSS feed URLs",
+    demandOption: true,
+})
+    .option("amount", {
+    alias: "a",
+    type: "number",
+    description: "Number of episodes to download",
+    default: 5,
+})
+    .option("path", {
+    alias: "p",
+    type: "string",
+    description: "Path to save downloaded podcasts",
+    default: "./downloads",
+}).argv;
+run(argv.rss, argv.amount, argv.path);
 //# sourceMappingURL=index.js.map

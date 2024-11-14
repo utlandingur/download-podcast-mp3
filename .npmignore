@@ -1,0 +1,14 @@
+# Exclude source files if using a build process
+/src
+
+# Exclude node_modules (npm installs dependencies anyway)
+node_modules
+
+# Exclude test files
+/test
+
+# Exclude Git-related files
+.git
+
+# Exclude TypeScript config if not needed for users
+tsconfig.json

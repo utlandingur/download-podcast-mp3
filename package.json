@@ -1,21 +1,28 @@
 {
-  "name": "download-podcast-mp3",
-  "version": "1.0.0",
+  "name": "podcast-rss-cli-tool",
+  "version": "0.0.1",
   "description": "script to automatically download mp3 files from podcast RSS feed",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "npx tsc"
+    "start": "node dist/index.js",
+    "build": "tsc --watch"
   },
   "type": "module",
-  "keywords": [],
+  "keywords": [
+    "podcast",
+    "mp3",
+    "download"
+  ],
   "author": "Utlandingur",
   "license": "ISC",
   "dependencies": {
-    "node-fetch": "^3.3.2"
+    "node-fetch": "^3.3.2",
+    "yargs": "^17.7.2"
+  },
+  "bin": {
+    "podcast-downloader": "./dist/index.js"
   },
   "devDependencies": {
-    "ts-node": "^10.9.2",
     "@types/node-fetch": "^2.6.12",
     "typescript": "^5.6.3"
   }
